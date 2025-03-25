@@ -36,7 +36,7 @@ export default function MessageDetails() {
   return (
     <View style={[styles.container, scoreNum >= 85 && { backgroundColor: '#ffe6e6' }]}>
       <Pressable onPress={() => router.back()} style={styles.backButton}>
-        <Text style={styles.backText}>⬅ חזור</Text>
+        <Text style={styles.backText}> חזור</Text>
       </Pressable>
       <Text style={styles.phone}>{phone}</Text>
       <Text style={styles.time}>{time}</Text>

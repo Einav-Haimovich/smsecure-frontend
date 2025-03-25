@@ -3,7 +3,6 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
-
 type Props = {
   id: string;
   score: number;
@@ -24,7 +23,13 @@ export default function MessageItem({ id, score, message, phone, time }: Props) 
   const handlePress = () => {
     router.push({
       pathname: '/message/[messageId]',
-      params: { messageId: id, score: score.toString(), message, phone, time },
+      params: {
+        messageId: id,
+        score: score.toString(),
+        message,
+        phone,
+        time,
+      },
     });
   };
 
