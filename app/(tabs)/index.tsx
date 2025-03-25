@@ -1,7 +1,8 @@
 import { StyleSheet } from 'react-native';
-
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
+import MessageScreen from '../MessageScreen';
+
 
 export default function TabOneScreen() {
   return (
@@ -13,6 +14,9 @@ export default function TabOneScreen() {
   );
 }
 
+export default function Page() {
+  return <MessageScreen />;
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
