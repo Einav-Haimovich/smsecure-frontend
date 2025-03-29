@@ -6,8 +6,8 @@ import MessageItem from '../../components/MessageItem';
 type Message = {
   id: string;
   score: number;
-  message: string;
-  phone: string;
+  content: string;
+  sender: string;
   time: string;
 };
 
@@ -15,35 +15,53 @@ export default function MessageScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      const fakeData: Message[] = [
-        {
-          id: '1',
-          score: 99,
-          message: 'שלום Shir, RS113652 משלוח...',
-          phone: 'דואר ישראל',
-          time: '14:31',
-        },
-        {
-          id: '2',
-          score: 48,
-          message: 'בשביל הקלות בזכויות...',
-          phone: '052-0000000',
-          time: '00:30',
-        },
-        {
-          id: '3',
-          score: 10,
-          message: 'החבילה שלך מחכה, לחץ כאן...',
-          phone: 'Bit',
-          time: '17:32',
-        },
-      ];
-      setMessages(fakeData);
-      setLoading(false);
-    };
+  const fakeMessages = [
+    {
+      message: 'שלום Shir, RS113652 משלוח...',
+      phone: 'דואר ישראל',
+      time: '14:31',
+    },
+    {
+      message: 'בשביל הקלות בזכויות...',
+      phone: '052-0000000',
+      time: '00:30',
+    },
+    {
+      message: 'החבילה שלך מחכה, לחץ כאן...',
+      phone: 'Bit',
+      time: '17:32',
+    },
+  ];
 
+  const fetchMessages = async () => {
+    try {
+      const payload = {
+        messages: fakeMessages.map((m) => ({
+          content: m.message,
+          sender: m.phone,
+          time: m.time,
+        })),
+      };
+
+      const response = await fetch("http://localhost:8000/messages/bulk/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      setMessages(data);
+    } catch (error) {
+      console.error("Failed to fetch messages:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  useEffect(() => {
     fetchMessages();
   }, []);
 
@@ -58,8 +76,8 @@ export default function MessageScreen() {
           <MessageItem
             id={item.id}
             score={item.score}
-            message={item.message}
-            phone={item.phone}
+            message={item.content}
+            phone={item.sender}
             time={item.time}
           />
         )}
