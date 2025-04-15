@@ -1,7 +1,7 @@
-// app/MessageScreen.tsx
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import MessageItem from '../../components/MessageItem';
+import { useRouter } from 'expo-router';
+import { View, FlatList, ActivityIndicator, StyleSheet, Button } from 'react-native';
 
 type Message = {
   id: string;
@@ -13,7 +13,9 @@ type Message = {
 
 export default function MessageScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [drafts, setDrafts] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const fakeMessages = [
     {
@@ -43,7 +45,7 @@ export default function MessageScreen() {
         })),
       };
 
-      const response = await fetch("http://192.168.10.148:8000/messages/bulk/", {
+      const response = await fetch("http://10.0.2.2:8000/messages/bulk/", {
         method: "POST",
         headers: {
           Accept: 'application/json',
@@ -53,14 +55,17 @@ export default function MessageScreen() {
       });
 
       const data = await response.json();
-      setMessages(data);
+      const highRisk = data.filter((msg: Message) => msg.score >= 85);
+      const normal = data.filter((msg: Message) => msg.score < 85);
+
+      setDrafts(highRisk);
+      setMessages(normal);
     } catch (error) {
       console.error("Failed to fetch messages:", error);
     } finally {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     fetchMessages();
@@ -70,6 +75,18 @@ export default function MessageScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Drafts"
+          onPress={() =>
+            router.push({
+              pathname: "/(tabs)/drafts",
+              params: { drafts: JSON.stringify(drafts) }, // מעביר את הדאטה
+            })
+          }
+        />
+      </View>
+
       <FlatList
         data={messages}
         keyExtractor={(item) => item.id}
@@ -89,4 +106,5 @@ export default function MessageScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
+  buttonContainer: { marginBottom: 12 },
 });
