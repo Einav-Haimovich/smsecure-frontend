@@ -11,12 +11,36 @@ type Message = {
   time: string;
 };
 
+//function to send single new message to the server
+const sendNewMessageToServer = async (newMessage: { content: string; sender: string; time: string }) => {
+  try {
+    const response = await fetch("http://10.0.2.2:8000/messages/", {
+      method: "POST",
+      headers: {
+        Accept: 'application/json',
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newMessage),
+    });
+
+    const data = await response.json();
+    if (data.score >= 85) {
+      setDrafts((prev) => [...prev, data]);
+    } else {
+      setMessages((prev) => [...prev, data]);
+    }
+  } catch (error) {
+    console.error("Failed to send new message:", error);
+  }
+};
+
+
+//send bulk of messages to the server
 export default function MessageScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [drafts, setDrafts] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-
   const fakeMessages = [
     {
       message: 'שלום Shir, RS113652 משלוח...',
@@ -53,11 +77,10 @@ export default function MessageScreen() {
         },
         body: JSON.stringify(payload),
       });
-
+      //divide highrisks and regular messages
       const data = await response.json();
       const highRisk = data.filter((msg: Message) => msg.score >= 85);
       const normal = data.filter((msg: Message) => msg.score < 85);
-
       setDrafts(highRisk);
       setMessages(normal);
     } catch (error) {
